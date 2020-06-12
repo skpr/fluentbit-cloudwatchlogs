@@ -34,7 +34,7 @@ func (c *Client) Add(group, stream string, timestamp time.Time, message string) 
 	}
 
 	c.Groups[group][stream] = append(c.Groups[group][stream], &logger.Message{
-		Line: []byte(message),
+		Line:      []byte(message),
 		Timestamp: timestamp,
 	})
 

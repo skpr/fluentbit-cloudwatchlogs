@@ -1,10 +1,10 @@
 package main
 
 import (
-	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"log"
 	"net/http"
 
+	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/skpr/fluentbit-cloudwatchlogs/internal/aws/cloudwatchlogs/dispatcher"
@@ -12,8 +12,8 @@ import (
 )
 
 var (
-	cliAddr = kingpin.Flag("addr", "Address to receive flush requests from Fluent Bit").Default(":8080").String()
-	cliRegion    = kingpin.Arg("region", "Region where logs will be displatched to.").Default(endpoints.ApSoutheast2RegionID).String()
+	cliAddr   = kingpin.Flag("addr", "Address to receive flush requests from Fluent Bit").Default(":8080").String()
+	cliRegion = kingpin.Arg("region", "Region where logs will be displatched to.").Default(endpoints.ApSoutheast2RegionID).String()
 )
 
 func main() {
