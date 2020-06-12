@@ -13,7 +13,7 @@ import (
 
 var (
 	cliAddr   = kingpin.Flag("addr", "Address to receive flush requests from Fluent Bit").Default(":8080").String()
-	cliRegion = kingpin.Arg("region", "Region where logs will be displatched to.").Default(endpoints.ApSoutheast2RegionID).String()
+	cliRegion = kingpin.Arg("region", "Region where logs will be dispatched to.").Default(endpoints.ApSoutheast2RegionID).String()
 )
 
 func main() {
