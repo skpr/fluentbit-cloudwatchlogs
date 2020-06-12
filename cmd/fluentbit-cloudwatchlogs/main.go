@@ -23,7 +23,7 @@ func main() {
 
 	http.HandleFunc("/", handler)
 
-	err := http.ListenAndServe(cliAddr, nil)
+	err := http.ListenAndServe(*cliAddr, nil)
 	if err != nil {
 		panic(err)
 	}
@@ -35,7 +35,7 @@ func handler(w http.ResponseWriter, r *http.Request) {
 		panic(err)
 	}
 
-	client, err := dispatcher.New("ap-southeast-2")
+	client, err := dispatcher.New(*cliRegion)
 	if err != nil {
 		panic(err)
 	}
