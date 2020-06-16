@@ -4,7 +4,7 @@ import (
 	"time"
 )
 
-// Line
+// Line which is shipped from Fluent Bit.
 type Line struct {
 	Timestamp  time.Time  `json:"timestamp"`
 	Log        string     `json:"log"`
