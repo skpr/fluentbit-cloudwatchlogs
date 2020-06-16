@@ -7,13 +7,14 @@ import (
 	"github.com/aws/aws-sdk-go/aws/endpoints"
 	"gopkg.in/alecthomas/kingpin.v2"
 
-	"github.com/skpr/fluentbit-cloudwatchlogs/internal/aws/cloudwatchlogs/dispatcher"
-	"github.com/skpr/fluentbit-cloudwatchlogs/internal/fluentbit/json"
+	"github.com/skpr/fluentbit-cloudwatchlogs/internal/flush"
 )
 
 var (
-	cliAddr   = kingpin.Flag("addr", "Address to receive flush requests from Fluent Bit").Default(":8080").String()
-	cliRegion = kingpin.Arg("region", "Region where logs will be dispatched to.").Default(endpoints.ApSoutheast2RegionID).String()
+	cliAddr    = kingpin.Flag("addr", "Address to receive flush requests from Fluent Bit").Default(":8080").String()
+	cliRegion  = kingpin.Arg("region", "Region where logs will be dispatched to.").Default(endpoints.ApSoutheast2RegionID).String()
+	cliPrefix  = kingpin.Arg("prefix", "Prefix to apply to CloudWatch Logs groups.").Required().String()
+	cliCluster = kingpin.Arg("cluster", "Cluster which this process resides.").Required().String()
 )
 
 func main() {
@@ -21,33 +22,11 @@ func main() {
 
 	log.Println("Starting server")
 
-	http.HandleFunc("/", handler)
+	server := &flush.Server{Region: *cliAddr}
+
+	http.HandleFunc("/", server.ServeHTTP)
 
 	err := http.ListenAndServe(*cliAddr, nil)
-	if err != nil {
-		panic(err)
-	}
-}
-
-func handler(w http.ResponseWriter, r *http.Request) {
-	lines, err := json.Parse(r.Body)
-	if err != nil {
-		panic(err)
-	}
-
-	client, err := dispatcher.New(*cliRegion)
-	if err != nil {
-		panic(err)
-	}
-
-	for _, line := range lines {
-		err := client.Add(line.Kubernetes.Namespace, line.Kubernetes.Pod, line.Timestamp, line.Log)
-		if err != nil {
-			panic(err)
-		}
-	}
-
-	err = client.Send()
 	if err != nil {
 		panic(err)
 	}
