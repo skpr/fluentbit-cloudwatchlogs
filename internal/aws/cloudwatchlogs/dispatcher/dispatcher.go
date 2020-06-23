@@ -1,6 +1,7 @@
 package dispatcher
 
 import (
+	"log"
 	"time"
 
 	"github.com/docker/docker/daemon/logger"
@@ -45,6 +46,8 @@ func (c *Client) Add(group, stream string, timestamp time.Time, message string) 
 func (c *Client) Send() error {
 	for group, streams := range c.Groups {
 		for stream, lines := range streams {
+			log.Printf("Pushing %d logs for %s/%s\n", len(lines), group, stream)
+
 			cw, err := awslogs.New(logger.Context{
 				Config: map[string]string{
 					"ConfigRegion":      c.region,

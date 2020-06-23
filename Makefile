@@ -17,8 +17,10 @@ lint:
 test:
 	go test -cover ./...
 
-release: build
-        docker push ${IMAGE}:${VERSION}
-        docker push ${IMAGE}:latest
+release: build push
+
+push:
+	docker push ${IMAGE}:${VERSION}
+	docker push ${IMAGE}:latest
 
 .PHONY: *
