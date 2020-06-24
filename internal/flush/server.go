@@ -27,6 +27,8 @@ type Server struct {
 	Cluster string
 	// Lock to ensure we only have one process pushing logs.
 	lock sync.Mutex
+	// Toggles on debugging.
+	Debug bool
 }
 
 // ServeHTTP
@@ -40,27 +42,33 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	lines, err := json.Parse(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
-		log.Println("Failed to parse request: %w", err)
+		log.Println("Failed to parse request:", err)
 		return
 	}
 
 	client, err := dispatcher.New(s.Region)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println("Failed to setup dispatcher: %w", err)
+		log.Println("Failed to setup dispatcher:", err)
 		return
 	}
 
 	for _, line := range lines {
 		project, err := getAnnotationValue(line.Kubernetes.Annotations, AnnotationProject)
 		if err != nil {
-			log.Println("Failed to get annotation: %w", err)
+			if s.Debug {
+				log.Printf("skipping %s/%s because annotation %s because: %s\n", line.Kubernetes.Namespace, line.Kubernetes.Pod, AnnotationProject, err)
+			}
+
 			continue
 		}
 
 		environment, err := getAnnotationValue(line.Kubernetes.Annotations, AnnotationEnvironment)
 		if err != nil {
-			log.Println("Failed to get annotation: %w", err)
+			if s.Debug {
+				log.Printf("skipping %s/%s because annotation %s because: %s\n", line.Kubernetes.Namespace, line.Kubernetes.Pod, AnnotationEnvironment, err)
+			}
+
 			continue
 		}
 
@@ -69,7 +77,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		err = client.Add(group, line.Kubernetes.Pod, line.Timestamp, line.Log)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
-			log.Println("Failed to add log to dispatcher: %w", err)
+			log.Println("Failed to add log to dispatcher:", err)
 			return
 		}
 	}
@@ -77,7 +85,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	err = client.Send()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
-		log.Println("Failed to send logs: %w", err)
+		log.Println("Failed to send logs:", err)
 		return
 	}
 }
