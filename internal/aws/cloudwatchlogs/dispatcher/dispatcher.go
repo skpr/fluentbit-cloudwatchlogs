@@ -50,10 +50,9 @@ func (c *Client) Send() error {
 
 			cw, err := awslogs.New(logger.Context{
 				Config: map[string]string{
-					"ConfigRegion":      c.region,
-					"ConfigCreateGroup": "true",
-					"ConfigGroup":       group,
-					"ConfigStream":      stream,
+					"awslogs-region": c.region,
+					"awslogs-group":  group,
+					"awslogs-stream": stream,
 				},
 			})
 			if err != nil {
