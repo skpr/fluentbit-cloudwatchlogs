@@ -1,10 +1,7 @@
 # github.com/Microsoft/go-winio v0.4.14
 ## explicit
-github.com/Microsoft/go-winio
-github.com/Microsoft/go-winio/pkg/guid
 # github.com/Sirupsen/logrus v1.0.6
 ## explicit
-github.com/Sirupsen/logrus
 # github.com/alecthomas/template v0.0.0-20190718012654-fb15b899a751
 ## explicit
 github.com/alecthomas/template
@@ -19,153 +16,47 @@ github.com/aws/aws-sdk-go/aws/awserr
 github.com/aws/aws-sdk-go/aws/awsutil
 github.com/aws/aws-sdk-go/aws/client
 github.com/aws/aws-sdk-go/aws/client/metadata
-github.com/aws/aws-sdk-go/aws/corehandlers
 github.com/aws/aws-sdk-go/aws/credentials
-github.com/aws/aws-sdk-go/aws/credentials/ec2rolecreds
-github.com/aws/aws-sdk-go/aws/credentials/endpointcreds
-github.com/aws/aws-sdk-go/aws/credentials/processcreds
-github.com/aws/aws-sdk-go/aws/credentials/stscreds
-github.com/aws/aws-sdk-go/aws/csm
-github.com/aws/aws-sdk-go/aws/defaults
-github.com/aws/aws-sdk-go/aws/ec2metadata
 github.com/aws/aws-sdk-go/aws/endpoints
 github.com/aws/aws-sdk-go/aws/request
-github.com/aws/aws-sdk-go/aws/session
 github.com/aws/aws-sdk-go/aws/signer/v4
 github.com/aws/aws-sdk-go/internal/context
 github.com/aws/aws-sdk-go/internal/ini
 github.com/aws/aws-sdk-go/internal/sdkio
 github.com/aws/aws-sdk-go/internal/sdkmath
 github.com/aws/aws-sdk-go/internal/sdkrand
-github.com/aws/aws-sdk-go/internal/sdkuri
 github.com/aws/aws-sdk-go/internal/shareddefaults
 github.com/aws/aws-sdk-go/internal/strings
 github.com/aws/aws-sdk-go/internal/sync/singleflight
 github.com/aws/aws-sdk-go/private/protocol
 github.com/aws/aws-sdk-go/private/protocol/json/jsonutil
 github.com/aws/aws-sdk-go/private/protocol/jsonrpc
-github.com/aws/aws-sdk-go/private/protocol/query
-github.com/aws/aws-sdk-go/private/protocol/query/queryutil
 github.com/aws/aws-sdk-go/private/protocol/rest
-github.com/aws/aws-sdk-go/private/protocol/xml/xmlutil
 github.com/aws/aws-sdk-go/service/cloudwatchlogs
-github.com/aws/aws-sdk-go/service/sts
-github.com/aws/aws-sdk-go/service/sts/stsiface
 # github.com/docker/docker v1.13.1
 ## explicit
-github.com/docker/docker/api
-github.com/docker/docker/api/server/httputils
-github.com/docker/docker/api/types
-github.com/docker/docker/api/types/blkiodev
-github.com/docker/docker/api/types/container
-github.com/docker/docker/api/types/filters
-github.com/docker/docker/api/types/mount
-github.com/docker/docker/api/types/network
-github.com/docker/docker/api/types/registry
-github.com/docker/docker/api/types/strslice
-github.com/docker/docker/api/types/swarm
-github.com/docker/docker/api/types/versions
-github.com/docker/docker/daemon/logger
-github.com/docker/docker/daemon/logger/loggerutils
-github.com/docker/docker/dockerversion
-github.com/docker/docker/pkg/ioutils
-github.com/docker/docker/pkg/jsonlog
-github.com/docker/docker/pkg/longpath
-github.com/docker/docker/pkg/parsers/kernel
-github.com/docker/docker/pkg/pubsub
-github.com/docker/docker/pkg/system
-github.com/docker/docker/pkg/useragent
-github.com/docker/docker/utils/templates
 # github.com/docker/go-connections v0.4.0
 ## explicit
-github.com/docker/go-connections/nat
 # github.com/docker/go-units v0.4.0
 ## explicit
-github.com/docker/go-units
 # github.com/docker/libtrust v0.0.0-20160708172513-aabc10ec26b7
 ## explicit
-github.com/docker/libtrust
-# github.com/golang/protobuf v1.3.3
-github.com/golang/protobuf/proto
-github.com/golang/protobuf/ptypes
-github.com/golang/protobuf/ptypes/any
-github.com/golang/protobuf/ptypes/duration
-github.com/golang/protobuf/ptypes/timestamp
 # github.com/gorilla/mux v1.7.4
 ## explicit
-github.com/gorilla/mux
+# github.com/jcxplorer/cwlogger v0.0.0-20170704082755-4e30a5a47e6a
+## explicit
 # github.com/jmespath/go-jmespath v0.3.0
 github.com/jmespath/go-jmespath
 # github.com/mattn/go-shellwords v1.0.10
 ## explicit
-github.com/mattn/go-shellwords
 # github.com/moby/moby v1.13.1
 ## explicit
-github.com/moby/moby/daemon/logger/awslogs
 # golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9
 ## explicit
-golang.org/x/crypto/ssh/terminal
-# golang.org/x/net v0.0.0-20200202094626-16171245cfb2
-golang.org/x/net/context
-golang.org/x/net/http/httpguts
-golang.org/x/net/http2
-golang.org/x/net/http2/hpack
-golang.org/x/net/idna
-golang.org/x/net/internal/timeseries
-golang.org/x/net/trace
 # golang.org/x/sys v0.0.0-20200610111108-226ff32320da
 ## explicit
-golang.org/x/sys/internal/unsafeheader
-golang.org/x/sys/unix
-golang.org/x/sys/windows
-# golang.org/x/text v0.3.0
-golang.org/x/text/secure/bidirule
-golang.org/x/text/transform
-golang.org/x/text/unicode/bidi
-golang.org/x/text/unicode/norm
-# google.golang.org/genproto v0.0.0-20190819201941-24fa4b261c55
-google.golang.org/genproto/googleapis/rpc/status
 # google.golang.org/grpc v1.29.1
 ## explicit
-google.golang.org/grpc
-google.golang.org/grpc/attributes
-google.golang.org/grpc/backoff
-google.golang.org/grpc/balancer
-google.golang.org/grpc/balancer/base
-google.golang.org/grpc/balancer/roundrobin
-google.golang.org/grpc/binarylog/grpc_binarylog_v1
-google.golang.org/grpc/codes
-google.golang.org/grpc/connectivity
-google.golang.org/grpc/credentials
-google.golang.org/grpc/credentials/internal
-google.golang.org/grpc/encoding
-google.golang.org/grpc/encoding/proto
-google.golang.org/grpc/grpclog
-google.golang.org/grpc/internal
-google.golang.org/grpc/internal/backoff
-google.golang.org/grpc/internal/balancerload
-google.golang.org/grpc/internal/binarylog
-google.golang.org/grpc/internal/buffer
-google.golang.org/grpc/internal/channelz
-google.golang.org/grpc/internal/envconfig
-google.golang.org/grpc/internal/grpclog
-google.golang.org/grpc/internal/grpcrand
-google.golang.org/grpc/internal/grpcsync
-google.golang.org/grpc/internal/grpcutil
-google.golang.org/grpc/internal/resolver/dns
-google.golang.org/grpc/internal/resolver/passthrough
-google.golang.org/grpc/internal/status
-google.golang.org/grpc/internal/syscall
-google.golang.org/grpc/internal/transport
-google.golang.org/grpc/keepalive
-google.golang.org/grpc/metadata
-google.golang.org/grpc/naming
-google.golang.org/grpc/peer
-google.golang.org/grpc/resolver
-google.golang.org/grpc/serviceconfig
-google.golang.org/grpc/stats
-google.golang.org/grpc/status
-google.golang.org/grpc/tap
 # gopkg.in/alecthomas/kingpin.v2 v2.2.6
 ## explicit
 gopkg.in/alecthomas/kingpin.v2

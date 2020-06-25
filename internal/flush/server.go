@@ -2,6 +2,7 @@ package flush
 
 import (
 	"fmt"
+	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 	"log"
 	"net/http"
 	"sync"
@@ -19,8 +20,8 @@ const (
 
 // Server for handling flush requests.
 type Server struct {
-	// Region where the logs should be put.
-	Region string
+	// Client for interacting with CloudWatch Logs.
+	Client *cloudwatchlogs.CloudWatchLogs
 	// Prefix to apply to CloudWatch Logs groups.
 	Prefix string
 	// Cluster which this process resides.
@@ -46,7 +47,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := dispatcher.New(s.Region)
+	client, err := dispatcher.New(s.Client)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Println("Failed to setup dispatcher:", err)
