@@ -2,10 +2,11 @@ package flush
 
 import (
 	"fmt"
-	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 	"log"
 	"net/http"
 	"sync"
+
+	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
 
 	"github.com/skpr/fluentbit-cloudwatchlogs/internal/aws/cloudwatchlogs/dispatcher"
 	"github.com/skpr/fluentbit-cloudwatchlogs/internal/fluentbit/json"
@@ -28,6 +29,8 @@ type Server struct {
 	Cluster string
 	// Lock to ensure we only have one process pushing logs.
 	lock sync.Mutex
+	// Amount of events to keep before flushing.
+	BatchSize int
 	// Toggles on debugging.
 	Debug bool
 }
@@ -40,6 +43,8 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	s.lock.Lock()
 	defer s.lock.Unlock()
 
+	log.Println("Parsing new request")
+
 	lines, err := json.Parse(r.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
@@ -47,7 +52,9 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client, err := dispatcher.New(s.Client)
+	log.Println("Initialising dispatcher client")
+
+	client, err := dispatcher.New(s.Client, s.BatchSize, s.Debug)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Println("Failed to setup dispatcher:", err)

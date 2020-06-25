@@ -4,26 +4,38 @@ import (
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
+	"log"
+	"sync"
 )
 
 const (
+	// ResourceAlreadyExistsCode is used to detect existing resources.
 	ResourceAlreadyExistsCode = "ResourceAlreadyExistsException"
 )
 
 // Client client for handling log events.
 type Client struct {
-	Group string
-	Stream string
+	// Client for interacting with CloudWatch Logs.
 	client *cloudwatchlogs.CloudWatchLogs
-	token *string
+	// Group which events will be pushed to.
+	Group string
+	// Stream which events will be pushed to.
+	Stream string
+	// Amount of events to keep before flushing.
+	batchSize int
+	// Events stored in memory before being pushed.
+	events []*cloudwatchlogs.InputLogEvent
+	// Lock to ensure logs are
+	lock sync.Mutex
 }
 
 // New client which creates the log group, stream and returns a client for batching logs to it.
-func New(client *cloudwatchlogs.CloudWatchLogs, group, stream string) (*Client, error) {
+func New(client *cloudwatchlogs.CloudWatchLogs, group, stream string, batchSize int) (*Client, error) {
 	batch := &Client{
 		Group: group,
 		Stream: stream,
 		client: client,
+		batchSize: batchSize,
 	}
 
 	err := PutLogGroup(client, group)
@@ -39,40 +51,47 @@ func New(client *cloudwatchlogs.CloudWatchLogs, group, stream string) (*Client, 
 	return batch, nil
 }
 
-func (c *Client) PutBatchLogEvents(events []*cloudwatchlogs.InputLogEvent, size int) error {
-	for _, chunk := range chunkMessages(events, size) {
-		input := &cloudwatchlogs.PutLogEventsInput{
-			LogGroupName:  aws.String(c.Group),
-			LogStreamName: aws.String(c.Stream),
-			LogEvents:     chunk,
-		}
+// Add event to the client.
+func (c *Client) Add(event *cloudwatchlogs.InputLogEvent) error {
+	c.events = append(c.events, event)
 
-		if c.token != nil {
-			input.SequenceToken = c.token
-		}
-
-		err := c.PutLogEvents(input)
-		if err != nil {
-			return err
-		}
+	if len(c.events) >= c.batchSize {
+		return c.Flush()
 	}
 
 	return nil
 }
 
+// Flush events stored in the client.
+func (c *Client) Flush() error {
+	c.lock.Lock()
+	defer c.lock.Unlock()
+
+	input := &cloudwatchlogs.PutLogEventsInput{
+		LogGroupName:  aws.String(c.Group),
+		LogStreamName: aws.String(c.Stream),
+		LogEvents:     c.events,
+	}
+
+	// Reset the logs back to
+	c.events = []*cloudwatchlogs.InputLogEvent{}
+
+	return c.putLogEvents(input)
+}
+
+
 // PutLogEvents will attempt to execute and handle invalid tokens.
-func (c *Client) PutLogEvents(input *cloudwatchlogs.PutLogEventsInput) error {
-	resp, err := c.client.PutLogEvents(input)
+func (c *Client) putLogEvents(input *cloudwatchlogs.PutLogEventsInput) error {
+	_, err := c.client.PutLogEvents(input)
 	if err != nil {
 		if exception, ok := err.(*cloudwatchlogs.InvalidSequenceTokenException); ok {
-			c.token = exception.ExpectedSequenceToken
-			return c.PutLogEvents(input)
+			log.Println("Refreshing token:", *input.LogGroupName, *input.LogStreamName)
+			input.SequenceToken = exception.ExpectedSequenceToken
+			return c.putLogEvents(input)
 		}
 
 		return err
 	}
-
-	c.token = resp.NextSequenceToken
 
 	return nil
 }
@@ -112,21 +131,4 @@ func PutLogStream(client *cloudwatchlogs.CloudWatchLogs, group, stream string) e
 	}
 
 	return nil
-}
-
-// Helper function to split a batch of log event input into chunks.
-func chunkMessages(messages []*cloudwatchlogs.InputLogEvent, size int) [][]*cloudwatchlogs.InputLogEvent {
-	var chunks [][]*cloudwatchlogs.InputLogEvent
-
-	for i := 0; i < len(messages); i += size {
-		end := i + size
-
-		if end > len(messages) {
-			end = len(messages)
-		}
-
-		chunks = append(chunks, messages[i:end])
-	}
-
-	return chunks
 }
