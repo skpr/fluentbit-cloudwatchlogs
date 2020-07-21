@@ -17,6 +17,8 @@ const (
 	AnnotationProject = "fluentbit.skpr.io/project"
 	// AnnotationEnvironment is used to construct a CloudWatch Logs group.
 	AnnotationEnvironment = "fluentbit.skpr.io/environment"
+	// AnnotationGroupOverride is used for overriding the default project/environment naming convention.
+	AnnotationGroupOverride = "fluentbit.skpr.io/group-override"
 )
 
 // Server for handling flush requests.
@@ -62,25 +64,14 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, line := range lines {
-		project, err := getAnnotationValue(line.Kubernetes.Annotations, AnnotationProject)
+		group, err := groupName(s.Prefix, s.Cluster, line.Kubernetes.Container, line.Kubernetes.Annotations)
 		if err != nil {
 			if s.Debug {
-				log.Printf("skipping %s/%s because annotation %s because: %s\n", line.Kubernetes.Namespace, line.Kubernetes.Pod, AnnotationProject, err)
+				log.Printf("skipping %s/%s because: %s\n", line.Kubernetes.Namespace, line.Kubernetes.Pod, err)
 			}
 
 			continue
 		}
-
-		environment, err := getAnnotationValue(line.Kubernetes.Annotations, AnnotationEnvironment)
-		if err != nil {
-			if s.Debug {
-				log.Printf("skipping %s/%s because annotation %s because: %s\n", line.Kubernetes.Namespace, line.Kubernetes.Pod, AnnotationEnvironment, err)
-			}
-
-			continue
-		}
-
-		group := groupName(s.Prefix, s.Cluster, project, environment, line.Kubernetes.Container)
 
 		err = client.Add(group, line.Kubernetes.Pod, line.Timestamp, line.Log)
 		if err != nil {
@@ -107,8 +98,21 @@ func getAnnotationValue(annotations map[string]string, key string) (string, erro
 	return annotations[key], nil
 }
 
-// Helper function to generate a group name.
-// This function is here to
-func groupName(prefix, cluster, project, environment, container string) string {
-	return fmt.Sprintf("/%s/%s/%s/%s/%s", prefix, cluster, project, environment, container)
+// Helper function to determine the group name for a Pod.
+func groupName(prefix, cluster, container string, annotations map[string]string) (string, error) {
+	if override, ok := annotations[AnnotationGroupOverride]; ok {
+		return override, nil
+	}
+
+	project, err := getAnnotationValue(annotations, AnnotationProject)
+	if err != nil {
+		return "", err
+	}
+
+	environment, err := getAnnotationValue(annotations, AnnotationEnvironment)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("/%s/%s/%s/%s/%s", prefix, cluster, project, environment, container), nil
 }
