@@ -24,6 +24,7 @@ require (
 	github.com/jcxplorer/cwlogger v0.0.0-20170704082755-4e30a5a47e6a // indirect
 	github.com/mattn/go-shellwords v1.0.10 // indirect
 	github.com/moby/moby v1.13.1 // indirect
+	github.com/stretchr/testify v1.5.1
 	golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9 // indirect
 	golang.org/x/sys v0.0.0-20200610111108-226ff32320da // indirect
 	google.golang.org/grpc v1.29.1 // indirect
