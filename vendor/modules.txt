@@ -48,6 +48,8 @@ github.com/aws/aws-sdk-go/private/protocol/xml/xmlutil
 github.com/aws/aws-sdk-go/service/cloudwatchlogs
 github.com/aws/aws-sdk-go/service/sts
 github.com/aws/aws-sdk-go/service/sts/stsiface
+# github.com/davecgh/go-spew v1.1.1
+github.com/davecgh/go-spew/spew
 # github.com/docker/docker v1.13.1
 ## explicit
 # github.com/docker/go-connections v0.4.0
@@ -66,6 +68,11 @@ github.com/jmespath/go-jmespath
 ## explicit
 # github.com/moby/moby v1.13.1
 ## explicit
+# github.com/pmezard/go-difflib v1.0.0
+github.com/pmezard/go-difflib/difflib
+# github.com/stretchr/testify v1.5.1
+## explicit
+github.com/stretchr/testify/assert
 # golang.org/x/crypto v0.0.0-20200604202706-70a84ac30bf9
 ## explicit
 # golang.org/x/sys v0.0.0-20200610111108-226ff32320da
@@ -75,3 +82,5 @@ github.com/jmespath/go-jmespath
 # gopkg.in/alecthomas/kingpin.v2 v2.2.6
 ## explicit
 gopkg.in/alecthomas/kingpin.v2
+# gopkg.in/yaml.v2 v2.2.2
+gopkg.in/yaml.v2
