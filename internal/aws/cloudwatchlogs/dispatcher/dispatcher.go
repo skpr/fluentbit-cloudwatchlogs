@@ -31,10 +31,10 @@ type Lines []*cloudwatchlogs.InputLogEvent
 // New client for dispatching logs to CloudWatch Logs.
 func New(client *cloudwatchlogs.CloudWatchLogs, batchSize int, debug bool) (*Client, error) {
 	return &Client{
-		client: client,
-		Groups: make(map[string]Streams),
+		client:    client,
+		Groups:    make(map[string]Streams),
 		batchSize: batchSize,
-		debug: debug,
+		debug:     debug,
 	}, nil
 }
 
@@ -45,7 +45,7 @@ func (c *Client) Add(group, stream string, timestamp time.Time, message string) 
 	}
 
 	c.Groups[group][stream] = append(c.Groups[group][stream], &cloudwatchlogs.InputLogEvent{
-		Message:      aws.String(message),
+		Message:   aws.String(message),
 		Timestamp: aws.Int64(timestamp.UnixNano() / int64(time.Millisecond)),
 	})
 

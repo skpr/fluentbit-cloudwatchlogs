@@ -1,11 +1,11 @@
 package logger
 
 import (
+	"sync"
+
 	"github.com/aws/aws-sdk-go/aws"
 	"github.com/aws/aws-sdk-go/aws/awserr"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
-	"log"
-	"sync"
 )
 
 const (
@@ -32,9 +32,9 @@ type Client struct {
 // New client which creates the log group, stream and returns a client for batching logs to it.
 func New(client *cloudwatchlogs.CloudWatchLogs, group, stream string, batchSize int) (*Client, error) {
 	batch := &Client{
-		Group: group,
-		Stream: stream,
-		client: client,
+		Group:     group,
+		Stream:    stream,
+		client:    client,
 		batchSize: batchSize,
 	}
 
@@ -79,17 +79,10 @@ func (c *Client) Flush() error {
 	return c.putLogEvents(input)
 }
 
-
 // PutLogEvents will attempt to execute and handle invalid tokens.
 func (c *Client) putLogEvents(input *cloudwatchlogs.PutLogEventsInput) error {
 	_, err := c.client.PutLogEvents(input)
 	if err != nil {
-		if exception, ok := err.(*cloudwatchlogs.InvalidSequenceTokenException); ok {
-			log.Println("Refreshing token:", *input.LogGroupName, *input.LogStreamName)
-			input.SequenceToken = exception.ExpectedSequenceToken
-			return c.putLogEvents(input)
-		}
-
 		return err
 	}
 
@@ -117,7 +110,7 @@ func PutLogGroup(client *cloudwatchlogs.CloudWatchLogs, name string) error {
 // PutLogStream will attempt to create a log stream and not return an error if it already exists.
 func PutLogStream(client *cloudwatchlogs.CloudWatchLogs, group, stream string) error {
 	_, err := client.CreateLogStream(&cloudwatchlogs.CreateLogStreamInput{
-		LogGroupName: aws.String(group),
+		LogGroupName:  aws.String(group),
 		LogStreamName: aws.String(stream),
 	})
 	if err != nil {

@@ -5,9 +5,9 @@ import (
 	"net/http"
 	_ "net/http/pprof"
 
+	kingpin "github.com/alecthomas/kingpin/v2"
 	"github.com/aws/aws-sdk-go/aws/session"
 	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
-	"gopkg.in/alecthomas/kingpin.v2"
 
 	"github.com/skpr/fluentbit-cloudwatchlogs/internal/flush"
 )
@@ -31,11 +31,11 @@ func main() {
 	}
 
 	server := &flush.Server{
-		Client:  cloudwatchlogs.New(sess),
-		Prefix:  *cliPrefix,
-		Cluster: *cliCluster,
+		Client:    cloudwatchlogs.New(sess),
+		Prefix:    *cliPrefix,
+		Cluster:   *cliCluster,
 		BatchSize: *cliBatch,
-		Debug:   *cliDebug,
+		Debug:     *cliDebug,
 	}
 
 	http.HandleFunc("/", server.ServeHTTP)
