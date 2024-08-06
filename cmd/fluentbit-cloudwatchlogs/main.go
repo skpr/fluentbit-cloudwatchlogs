@@ -1,13 +1,14 @@
 package main
 
 import (
+	"context"
 	"log"
 	"net/http"
 	_ "net/http/pprof"
 
-	"github.com/aws/aws-sdk-go/aws/session"
-	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
-	"gopkg.in/alecthomas/kingpin.v2"
+	"github.com/alecthomas/kingpin/v2"
+	"github.com/aws/aws-sdk-go-v2/config"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
 	"github.com/skpr/fluentbit-cloudwatchlogs/internal/flush"
 )
@@ -25,17 +26,17 @@ func main() {
 
 	log.Println("Starting server")
 
-	sess, err := session.NewSession()
+	cfg, err := config.LoadDefaultConfig(context.TODO())
 	if err != nil {
 		panic(err)
 	}
 
 	server := &flush.Server{
-		Client:  cloudwatchlogs.New(sess),
-		Prefix:  *cliPrefix,
-		Cluster: *cliCluster,
+		Client:    cloudwatchlogs.NewFromConfig(cfg),
+		Prefix:    *cliPrefix,
+		Cluster:   *cliCluster,
 		BatchSize: *cliBatch,
-		Debug:   *cliDebug,
+		Debug:     *cliDebug,
 	}
 
 	http.HandleFunc("/", server.ServeHTTP)

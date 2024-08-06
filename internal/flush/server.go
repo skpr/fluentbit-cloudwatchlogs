@@ -1,12 +1,13 @@
 package flush
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"sync"
 
-	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
 	"github.com/skpr/fluentbit-cloudwatchlogs/internal/aws/cloudwatchlogs/dispatcher"
 	"github.com/skpr/fluentbit-cloudwatchlogs/internal/fluentbit/json"
@@ -24,7 +25,7 @@ const (
 // Server for handling flush requests.
 type Server struct {
 	// Client for interacting with CloudWatch Logs.
-	Client *cloudwatchlogs.CloudWatchLogs
+	Client *cloudwatchlogs.Client
 	// Prefix to apply to CloudWatch Logs groups.
 	Prefix string
 	// Cluster which this process resides.
@@ -64,7 +65,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	for _, line := range lines {
-		group, err := groupName(s.Prefix, s.Cluster, line.Kubernetes.Container, line.Kubernetes.Annotations)
+		group, err := groupName(s.Prefix, s.Cluster, line.Kubernetes.Annotations)
 		if err != nil {
 			if s.Debug {
 				log.Printf("skipping %s/%s because: %s\n", line.Kubernetes.Namespace, line.Kubernetes.Pod, err)
@@ -73,7 +74,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 			continue
 		}
 
-		err = client.Add(group, line.Kubernetes.Pod, line.Timestamp, line.Log)
+		err = client.Add(group, line.Kubernetes.Container, line.Timestamp, line.Log)
 		if err != nil {
 			http.Error(w, err.Error(), http.StatusInternalServerError)
 			log.Println("Failed to add log to dispatcher:", err)
@@ -81,7 +82,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = client.Send()
+	err = client.Send(context.TODO())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Println("Failed to send logs:", err)
@@ -99,7 +100,7 @@ func getAnnotationValue(annotations map[string]string, key string) (string, erro
 }
 
 // Helper function to determine the group name for a Pod.
-func groupName(prefix, cluster, container string, annotations map[string]string) (string, error) {
+func groupName(prefix, cluster string, annotations map[string]string) (string, error) {
 	if override, ok := annotations[AnnotationGroupOverride]; ok {
 		return override, nil
 	}
@@ -114,5 +115,5 @@ func groupName(prefix, cluster, container string, annotations map[string]string)
 		return "", err
 	}
 
-	return fmt.Sprintf("/%s/%s/%s/%s/%s", prefix, cluster, project, environment, container), nil
+	return fmt.Sprintf("/%s/%s/%s/%s", prefix, cluster, project, environment), nil
 }
