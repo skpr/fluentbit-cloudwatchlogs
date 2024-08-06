@@ -1,12 +1,13 @@
 package flush
 
 import (
+	"context"
 	"fmt"
 	"log"
 	"net/http"
 	"sync"
 
-	"github.com/aws/aws-sdk-go/service/cloudwatchlogs"
+	"github.com/aws/aws-sdk-go-v2/service/cloudwatchlogs"
 
 	"github.com/skpr/fluentbit-cloudwatchlogs/internal/aws/cloudwatchlogs/dispatcher"
 	"github.com/skpr/fluentbit-cloudwatchlogs/internal/fluentbit/json"
@@ -24,7 +25,7 @@ const (
 // Server for handling flush requests.
 type Server struct {
 	// Client for interacting with CloudWatch Logs.
-	Client *cloudwatchlogs.CloudWatchLogs
+	Client *cloudwatchlogs.Client
 	// Prefix to apply to CloudWatch Logs groups.
 	Prefix string
 	// Cluster which this process resides.
@@ -81,7 +82,7 @@ func (s *Server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 
-	err = client.Send()
+	err = client.Send(context.TODO())
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		log.Println("Failed to send logs:", err)
@@ -114,5 +115,5 @@ func groupName(prefix, cluster string, annotations map[string]string) (string, e
 		return "", err
 	}
 
-	return fmt.Sprintf("/%s/%s/%s/%s/%s", prefix, cluster, project, environment), nil
+	return fmt.Sprintf("/%s/%s/%s/%s", prefix, cluster, project, environment), nil
 }
