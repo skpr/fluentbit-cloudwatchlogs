@@ -32,7 +32,7 @@ func main() {
 	}
 
 	server := &flush.Server{
-		Client:    cloudwatchlogs.New(cfg),
+		Client:    cloudwatchlogs.NewFromConfig(cfg),
 		Prefix:    *cliPrefix,
 		Cluster:   *cliCluster,
 		BatchSize: *cliBatch,
